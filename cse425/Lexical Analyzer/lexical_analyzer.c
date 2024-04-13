@@ -5,7 +5,7 @@
 /* Variables */
 int  charClass;
 char  lexeme [100];
-char  nextChar;
+char  nextChar; 
 int  lexLen;
 int  token;
 int  nextToken;
