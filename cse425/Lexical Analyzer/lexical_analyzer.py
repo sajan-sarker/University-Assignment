@@ -14,10 +14,10 @@ import os # Miscellaneous operating system interfaces
 nltk.download('punkt') # Download the 'punkt' package from the NLTK library for tokenization if not available.
 
 ### patterns for regular expressions for different tokens
-keywords = r"auto|break|case|char|const|continue|default|do|double|else|enum|extern|float|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|void|volatile|while|string|class|struc|include"
+keywords = r"auto|break|case|#include|char|const|continue|default|do|double|else|enum|extern|float|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|void|volatile|while|string|class|struc|include"
 operators = r"(\++)|(-)|(=)|(\*)|(/)|(%)|(--)|(<=)|(>=)"
 constant = r"^(\d+)$"
-special_characters = r"[@&~!#$\^\|:?,\.']|\""
+special_characters = r"[@&~#!$\^\|:?,\.']|\""
 identifiers = r"^[a-zA-Z_]+[a-zA-Z0-9_]*"
 headers = r"([a-zA-Z]+\.[h])"
 semicolon = r";"
@@ -125,7 +125,7 @@ def get_tokens(program):
             elif(re.findall(angle_brackets, token)):
                 print("Token is ANGLE BRACKETS,{:>4} Lexeme is-> {}.".format("",token))
             else:
-                print("Unknown Value")
+                print("Token is UNKNOWN,{:>11} Lexeme is-> {}.".format("",token))
     print("Total number of tokens are: ", count)
 
 def main():
