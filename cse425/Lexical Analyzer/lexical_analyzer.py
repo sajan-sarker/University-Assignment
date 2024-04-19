@@ -1,5 +1,6 @@
 # Filename: lexical_analyzer.py
 # Problem: Write a program using either C/C++, Java or Python language for a lexical analyzer that can tokenize a C statement and can detect C keyword.
+# Solution: The program reads a C program from a file or from user, removes comments, newlines, and spaces from the program, and then extracts tokens from the processed program using Python Programming Language.
 
 #########################################
 ###  Submitted by: Sajan Kumer Sarker  ##
@@ -15,7 +16,15 @@ nltk.download('punkt') # Download the 'punkt' package from the NLTK library for 
 
 ### patterns for regular expressions for different tokens
 keywords = r"auto|break|case|#include|char|const|continue|default|do|double|else|enum|extern|float|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|void|volatile|while|string|class|struc|include"
-operators = r"(\++)|(-)|(=)|(\*)|(/)|(%)|(--)|(<=)|(>=)"
+assignment_operators = r"(\+=)|(-=)|(\*=)|(/=)|(%=)|(&=)|(=)|(\^=)|(>>=)|(<<=)"
+relational_operators = r"(==)|(!=)|(<)|(>)|(<=)|(>=)"
+logical_operators = r"(&&)|(\|\|)|(!)"
+bitwise_operators = r"(&)|(\|)|(\^)|(~)|(<<)|(>>)"
+addition_operators = r"(\+)"
+subtraction_operators = r"(-)"
+multiplication_operators = r"(\*)"
+division_operators = r"(/)"
+modulus_operators = r"(%)"
 constant = r"^(\d+)$"
 special_characters = r"[@&~#!$\^\|:?,\.']|\""
 identifiers = r"^[a-zA-Z_]+[a-zA-Z0-9_]*"
@@ -101,31 +110,47 @@ def get_tokens(program):
             count += 1
             #print(token)
             if(re.findall(keywords, token)):
-                print("Token is KEYWORDS,{:>10} Lexeme is-> {}.".format("",token))
+                print("Token is KEYWORD,{:>10} Lexeme is-> {}.".format("",token))
             elif(re.findall(headers, token)):
-                print("Token is HEADERS,{:>11} Lexeme is-> {}.".format("",token))
+                print("Token is HEADER,{:>11} Lexeme is-> {}.".format("",token))
             elif (re.findall(identifiers, token)):
                 if 'include' or '.h' not in token:
-                    print("Token is IDENTIFIERS,{:>7} Lexeme is-> {}.".format("",token))
-            elif(re.findall(operators, token)):
-                print("Token is OPERATORS,{:>9} Lexeme is-> {}.".format("",token))
+                    print("Token is IDENTIFIER,{:>7} Lexeme is-> {}.".format("",token))
+            elif(re.findall(assignment_operators, token)):
+                print("Token is ASSIGN OPERATOR,{:>2} Lexeme is-> {}.".format("",token))
+            elif(re.findall(relational_operators, token)):
+                print("Token is RELATION OPERATOR,{:>0} Lexeme is-> {}.".format("",token))
+            elif(re.findall(logical_operators, token)):
+                print("Token is LOGICAL OPERATOR, Lexeme is-> {}.".format(token))
+            elif(re.findall(bitwise_operators, token)):
+                print("Token is BITWISE OPERATOR,{:>1} Lexeme is-> {}.".format("",token))
+            elif(re.findall(addition_operators, token)):
+                print("Token is ADDITION OPERATOR, Lexeme is-> {}.".format(token))
+            elif(re.findall(subtraction_operators, token)):
+                print("Token is SUBTRACT OPERATOR, Lexeme is-> {}.".format(token))
+            elif(re.findall(multiplication_operators, token)):
+                print("Token is MULTIPLICATION OPERATOR, Lexeme is-> {}.".format(token))
+            elif(re.findall(division_operators, token)):
+                print("Token is DIVISION OPERATOR, Lexeme is-> {}.".format(token))
+            elif(re.findall(modulus_operators, token)):
+                print("Token is MODULUS OPERATOR,{:>1} Lexeme is-> {}.".format("",token))
             elif(re.findall(constant, token)):
-                print("Token is CONSTANT,{:>10} Lexeme is-> {}.".format("",token))
+                print("Token is CONSTANT,{:>9} Lexeme is-> {}.".format("",token))
             elif(re.findall(special_characters, token)):
                 if '.h' not in token:
-                    print("Token is SPECIAL CHARACTERS, Lexeme is-> {}.".format(token))
+                    print("Token is SPECIAL CHARACTER, Lexeme is-> {}.".format(token))
             elif(re.findall(semicolon, token)):
-                print("Token is SEMICOLON,{:>9} Lexeme is-> {}.".format("",token))
+                print("Token is SEMICOLON,{:>8} Lexeme is-> {}.".format("",token))
             elif(re.findall(parentheses, token)):
-                print("Token is PARENTHESES,{:>7} Lexeme is-> {}.".format("",token))
+                print("Token is PARENTHESE,{:>7} Lexeme is-> {}.".format("",token))
             elif(re.findall(braces, token)):
-                print("Token is BRACES,{:>12} Lexeme is-> {}.".format("",token))
+                print("Token is BRACE,{:>12} Lexeme is-> {}.".format("",token))
             elif(re.findall(square_brackets, token)):
-                print("Token is SQUARE BRACKETS,{:>10} Lexeme is-> {}.".format("",token))
+                print("Token is SQUARE BRACKET,{:>10} Lexeme is-> {}.".format("",token))
             elif(re.findall(angle_brackets, token)):
-                print("Token is ANGLE BRACKETS,{:>4} Lexeme is-> {}.".format("",token))
+                print("Token is ANGLE BRACKET,{:>4} Lexeme is-> {}.".format("",token))
             else:
-                print("Token is UNKNOWN,{:>11} Lexeme is-> {}.".format("",token))
+                print("Token is UNKNOWN,{:>10} Lexeme is-> {}.".format("",token))
     print("Total number of tokens are: ", count)
 
 def main():
@@ -139,7 +164,7 @@ def main():
         #print(os.getcwd())  # Current working directory
         f = open('D:/Programing/University-Assignment/cse425/Lexical Analyzer/code.c')      # Take the input from a .c file
         main_program = f.read()
-        #main_program = input("Enter the Script: ") # Take the input from the user
+        #main_program = input("Enter the Expression: ") # Take the input from the user
         without_comments = remove_comments(main_program)
         without_newline = remove_newline(without_comments)
         program = remove_spaces(without_newline)
