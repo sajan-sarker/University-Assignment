@@ -2,59 +2,61 @@
 #include<iostream>
 using namespace std;
 
-#define n 1000
+#define n 1000  // Define the size of the stack
 
 class Stack{
-    int* arr;
-    int top;
+    int* arr;   // Pointer to store the stack
+    int top;    // Variable to store the top of the stack
 
     public:
-    Stack(){
-        arr = new int[n];
-        top = -1;
+    Stack(){    // Constructor to initialize the stack
+        arr = new int[n];   // Initialize the stack
+        top = -1;   // Initialize the top of the stack
     }
 
-    void push(int x){
-        if(top == n-1){
-            cout << "Stack is Full!";
+    void push(int x){   // Function to push an element to the stack
+        if(top == n-1){ // Check if the stack is full
+            cout << "Stack is Full!";   // Print the message
+            return; 
+        }
+        // else: 
+        top++;  // Increment the top of the stack
+        arr[top] = x;   // Push the element to the stack
+    }
+
+    void pop(){ // Function to pop an element from the stack
+        if(top == -1){  // Check if the stack is empty
+            cout<< "No Element to POP" << endl; // Print the message
             return;
         }
-        
-        top++;
-        arr[top] = x;
+        top --; // else: decrement the top of the stack
     }
 
-    void pop(){
-        if(top == -1){
-            cout<< "No Element to POP" << endl;
-            return;
+    int Top(){  // Function to get the top element of the stack
+        if(top == -1){  // Check if the stack is empty
+            cout << "No element on stack" << endl;  // Print the message
+            return -1;  // Return -1
         }
-        top --;
+        return arr[top];    // Return the top element of the stack
     }
 
-    int Top(){
-        if(top == -1){
-            cout << "No element on stack" << endl;
-            return -1;
-        }
-        return arr[top];
-    }
-
-    bool isEmpty(){
-        return top == -1;
+    bool isEmpty(){ // Function to check if the stack is empty
+        return top == -1;   // Return true if the stack is empty
     }
 };
 
 int main(){
-    Stack s;
+    Stack s;    // Object of the Stack class
     
-    cout << "Check Stack: " << s.isEmpty() << endl;
-    s.push(211);
-    s.push(11);
-    s.push(31);
-    cout << "Check Top: " << s.Top() << endl;
-    s.pop();
-    s.pop();
-    cout << "Check Top: " << s.Top() << endl;
-    cout << "Check Stack: " << s.isEmpty() << endl;
+    cout << "Check Stack: " << s.isEmpty() << endl; // Check if the stack is empty
+    s.push(211);    // Push an element to the stack
+    s.push(11); // Push an element to the stack
+    s.push(31); // Push an element to the stack
+    cout << "Check Top: " << s.Top() << endl;   // Check the top element of the stack
+    s.pop();    // Pop an element from the stack
+    s.pop();    // Pop an element from the stack
+    cout << "Check Top: " << s.Top() << endl;   // Check the top element of the stack
+    cout << "Check Stack: " << s.isEmpty() << endl; // Check if the stack is empty
+    s.pop();    // Pop an element from the stack
+    cout << "Check Top: " << s.Top() << endl;   // Check the top element of the stack
 }
