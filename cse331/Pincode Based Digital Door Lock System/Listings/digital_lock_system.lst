@@ -1,0 +1,302 @@
+C51 COMPILER V9.60.7.0   DIGITAL_LOCK_SYSTEM                                               05/27/2024 21:11:35 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE DIGITAL_LOCK_SYSTEM
+OBJECT MODULE PLACED IN .\Objects\digital_lock_system.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE digital_lock_system.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(
+                    -.\Listings\digital_lock_system.lst) TABS(2) OBJECT(.\Objects\digital_lock_system.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #include <string.h>
+   3          // Pin configuration for LEDs
+   4          sbit lw = P0^0;
+   5          sbit lb = P0^2;
+   6          sbit lr = P0^4;
+   7          
+   8          // Pin configuration for 7-segment display
+   9          sbit da = P1^0;
+  10          sbit db = P1^1;
+  11          sbit dc = P1^2;
+  12          sbit dd = P1^3;
+  13          sbit de = P1^4;
+  14          sbit df = P1^5;
+  15          sbit dg = P1^6;
+  16          
+  17          // Pin configuration for stepper motor
+  18          sbit m1 = P2^0;
+  19          sbit m2 = P2^1;
+  20          sbit m3 = P2^2;
+  21          sbit m4 = P2^3;
+  22          
+  23          // Pin configuration for keypad column
+  24          sbit c1 = P3^0;
+  25          sbit c2 = P3^1;
+  26          sbit c3 = P3^2;
+  27          
+  28          // Pin configuration for keypad row
+  29          sbit r1 = P3^3;
+  30          sbit r2 = P3^4;
+  31          sbit r3 = P3^5;
+  32          sbit r4 = P3^6;
+  33          
+  34          int n;  // counter
+  35          char key; // pressed digit
+  36          char codes[] = "54321"; // PIN Code
+  37          char id[5]; 
+  38          
+  39          // Function Declaration
+  40          void init_led();          // Initialize LEDs
+  41          void init_display();      // Initialize 7-segment display
+  42          void delay(int);          // Delay function
+  43          char scan_key();          // get digit
+  44          char read_keypad();       // access the keypad
+  45          void display_digit(char); // display the digit
+  46          void door_open();         // open door
+  47          void door_close();        // close door
+  48          
+  49          void main() {
+  50   1        for(;;){
+  51   2          P1 = 0x00;  //Using port 1 as output port
+  52   2          P2 = 0x00;  //Using port 1 as output port
+  53   2          P3 = 0xff;  //Using port 1 as input port
+  54   2          P0 = 0x00;  //Using port 1 as output port
+C51 COMPILER V9.60.7.0   DIGITAL_LOCK_SYSTEM                                               05/27/2024 21:11:35 PAGE 2   
+
+  55   2          lw = 1;
+  56   2          lb = 1;
+  57   2          lr = 1;
+  58   2          init_led();
+  59   2          init_display();
+  60   2          n = 0;
+  61   2          while(n<5){
+  62   3            key = scan_key();
+  63   3            id[n] = key;
+  64   3            delay(100);
+  65   3            n++;
+  66   3          }
+  67   2          if(strcmp(codes, id) ==0){
+  68   3            door_open();
+  69   3            
+  70   3          }
+  71   2          else{
+  72   3            lw = 0;
+  73   3            lr = 0;
+  74   3            delay(4000);
+  75   3            lr = 1;
+  76   3            delay(2);
+  77   3          }
+  78   2        }
+  79   1      }
+  80          
+  81          void door_open(){
+  82   1        lw = 0;
+  83   1        lb = 0;
+  84   1        delay(200);
+  85   1        m4= 1;
+  86   1        m2 = m3 = m1 = 0;
+  87   1        delay(200);
+  88   1        m3 = 1;
+  89   1        m1 = m2 = m4 = 0;
+  90   1        delay(5000);
+  91   1        door_close();
+  92   1        delay(200);
+  93   1        
+  94   1      }
+  95          void door_close(){
+  96   1        lw = 0;
+  97   1        lb = 1;
+  98   1        delay(200);
+  99   1        m4 = 1;
+ 100   1        m1 = m2 = m3 = 0;
+ 101   1        delay(200);
+ 102   1        m1 = 1;
+ 103   1        m2 = m3 = m4 = 0;
+ 104   1        delay(200);
+ 105   1        
+ 106   1      }
+ 107          
+ 108          
+ 109          void init_led() {
+ 110   1          delay(2);
+ 111   1          lw = 0;  // lw LED always on
+ 112   1          delay(2);
+ 113   1      }
+ 114          
+ 115          void init_display(){
+ 116   1          da=db=dc=dd=de=df=dg=0;
+C51 COMPILER V9.60.7.0   DIGITAL_LOCK_SYSTEM                                               05/27/2024 21:11:35 PAGE 3   
+
+ 117   1          delay(2);
+ 118   1      }
+ 119          
+ 120          char scan_key()
+ 121          {
+ 122   1        char b='a';
+ 123   1        while(b=='a'){
+ 124   2          b=read_keypad();
+ 125   2        }
+ 126   1        return b;
+ 127   1      }
+ 128          //Function to take input from Lcd Keyboard 4*3
+ 129          char read_keypad(){
+ 130   1        c1=c2=c3=1; // all columns are initially low
+ 131   1        r1=r2=r3=r4=0; // all rows are initially low (active-high)
+ 132   1        
+ 133   1        //when first row is active and others are incactive
+ 134   1        r1=0;
+ 135   1        r2=r3=r4=1;
+ 136   1        //if row=0 column=0 then 1 is returned or if we enter 1 in keypad 2
+ 137   1        if(c1==0){
+ 138   2          display_digit('1');
+ 139   2          delay(2);
+ 140   2          return '1';
+ 141   2        }
+ 142   1        //if row=0 column=1 then 2 is returned or if we enter  in keypad 2
+ 143   1        if(c2==0){
+ 144   2          display_digit('2');
+ 145   2          delay(2);
+ 146   2          return '2';
+ 147   2        }
+ 148   1        //if row=0 column=2 then 3 is returned or if we enter  in keypad 3
+ 149   1        if(c3==0){
+ 150   2          display_digit('3');
+ 151   2          delay(2);
+ 152   2          return '3';
+ 153   2        }
+ 154   1        
+ 155   1        //when second row is active and others are incactive
+ 156   1        r2=0;
+ 157   1        r1=r3=r4=1;
+ 158   1        //if row=1 column=0 then 4 is returned or if we enter  in keypad 4
+ 159   1        if(c1==0){
+ 160   2          display_digit('4');
+ 161   2          delay(2);
+ 162   2          return '4';
+ 163   2        }
+ 164   1        //if row=1 column=1 then 5 is returned or if we enter  in keypad 5
+ 165   1        if(c2==0){
+ 166   2          display_digit('5');
+ 167   2          delay(2);
+ 168   2          return '5';
+ 169   2        }
+ 170   1        //if row=1 column=2 then 6 is returned or if we enter  in keypad 6
+ 171   1        if(c3==0){
+ 172   2          display_digit('6');
+ 173   2          delay(2);
+ 174   2          return '6';
+ 175   2        }
+ 176   1        
+ 177   1        //when third row is active and others are incactive
+ 178   1        r3=0;
+C51 COMPILER V9.60.7.0   DIGITAL_LOCK_SYSTEM                                               05/27/2024 21:11:35 PAGE 4   
+
+ 179   1        r1=r2=r4=1;
+ 180   1        //if row=2 column=0 then 7 is returned or if we enter  in keypad 7
+ 181   1        if(c1==0){
+ 182   2          display_digit('7');
+ 183   2          delay(2);
+ 184   2          return '7';
+ 185   2        }
+ 186   1        //if row=2 column=1 then 8 is returned or if we enter  in keypad 8
+ 187   1        if(c2==0){
+ 188   2          display_digit('8');
+ 189   2          delay(2);
+ 190   2          return '8';
+ 191   2        }
+ 192   1        //if row=2 column=2 then 9 is returned or if we enter  in keypad 9
+ 193   1        if(c3==0){
+ 194   2          display_digit('9');
+ 195   2          delay(2);
+ 196   2          return '9';
+ 197   2        }
+ 198   1        
+ 199   1        //when fourth row is active and others are incactive
+ 200   1        r4=0;
+ 201   1        r1=r2=r3=1;
+ 202   1        //if row=3 column=0 then * is returned or if we enter  in keypad *
+ 203   1        //if(c1==0){
+ 204   1        //  lcddata('*');
+ 205   1        //  delay(2);
+ 206   1        //  return 0;
+ 207   1        //}
+ 208   1        //if row=3 column=1 then 0 is returned or if we enter  in keypad 0
+ 209   1        if(c2==0){
+ 210   2          display_digit('0');
+ 211   2          delay(2);
+ 212   2          return '0';
+ 213   2        }
+ 214   1      
+ 215   1        return 'a';
+ 216   1      }
+ 217          
+ 218          void display_digit(char digit) {
+ 219   1          switch (digit) {
+ 220   2              case '0':
+ 221   2                  da = db = dc = dd = de = df = 1;
+ 222   2                  dg = 0;
+ 223   2                  break;
+ 224   2              case '1':
+ 225   2                  db = dc = 1;
+ 226   2                  da = dd = de = df = dg = 0;
+ 227   2                  break;
+ 228   2              case '2':
+ 229   2                  da = db = dd = de = dg = 1;
+ 230   2                  dc = df = 0;
+ 231   2                  break;
+ 232   2              case '3':
+ 233   2                  da = db = dc = dd = dg = 1;
+ 234   2                  de = df = 0;
+ 235   2                  break;
+ 236   2              case '4':
+ 237   2                  db = dc = df = dg = 1;
+ 238   2                  da = dd = de = 0;
+ 239   2                  break;
+ 240   2              case '5':
+C51 COMPILER V9.60.7.0   DIGITAL_LOCK_SYSTEM                                               05/27/2024 21:11:35 PAGE 5   
+
+ 241   2                  da = df = dd = dc = dg = 1;
+ 242   2                  db = de = 0;
+ 243   2                  break;
+ 244   2              case '6':
+ 245   2                  da = dc = dd = de = df = dg = 1;
+ 246   2                  db = 0;
+ 247   2                  break;
+ 248   2              case '7':
+ 249   2                  da = db = dc = 1;
+ 250   2                  dd = de = df = dg = 0;
+ 251   2                  break;
+ 252   2              case '8':
+ 253   2                  da = db = dc = dd = de = df = dg = 1;
+ 254   2                  break;
+ 255   2              case '9':
+ 256   2                  da = db = dc = dd = de = df = dg = 1;
+ 257   2                  de = 0;
+ 258   2                  break;
+ 259   2              default:
+ 260   2                  break;
+ 261   2          }
+ 262   1          delay(300); // Delay for 200ms to display the digit
+ 263   1          init_display(); // Turn off the display after showing the digit
+ 264   1      }
+ 265          
+ 266          void delay(int ms) {
+ 267   1          int i, j;
+ 268   1          for (i = 0; i < ms; i++)
+ 269   1              for (j = 0; j < 120; j++);
+ 270   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    693    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     14    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
